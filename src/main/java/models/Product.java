@@ -1,11 +1,26 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
 public class Product {
     private String name;
     private Collection<Ingredient> ingredients;
+
+    public static Product getDefaultProduct() {
+        Product product = new Product();
+        Ingredient water = new Ingredient("Water");
+        Ingredient sugar = new Ingredient("Sugar");
+        Ingredient coffee = new Ingredient("Coffee");
+        Collection<Ingredient> ingredients = new ArrayList<>();
+        ingredients.add(water);
+        ingredients.add(sugar);
+        ingredients.add(coffee);
+        product.setIngredients(ingredients);
+        product.setName("Cappuccino");
+        return product;
+    }
 
     public String getName() {
         return name;

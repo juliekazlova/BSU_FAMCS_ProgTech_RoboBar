@@ -8,6 +8,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import models.Client;
+import models.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +38,10 @@ public class Robobar extends Application {
             switch (data) {
                 case "User":
                     showUserInputDialog();
-                    new ClientWindow().start(new Stage());
+                    Client user = new Client();
+                    user.setFullName("Irina");
+                    user.setId(1);
+                    new ProductApp(user).start(new Stage());
                     //todo show window for User
                     break;
                 case "Bartender":
