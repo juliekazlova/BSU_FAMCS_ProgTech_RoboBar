@@ -54,26 +54,34 @@ public class DBUtils {
     }
 
     public ObservableList<Product> getAllProducts() {
-        String query = "select name from products;";
-        List<Product> products = new ArrayList<>();
+        String query = "select name, ingredients_list from products;";
+        List<String> productNames = new ArrayList<>();
+        List<String> productIds = new ArrayList<>();
         try (ResultSet rs = statement.executeQuery(query)) {
             while (rs.next()) {
-                products.add(new Product(rs.getString(1), getIngredientsById(rs.getString(2))));
+               productNames.add(rs.getString(1));
+               productIds.add(rs.getString(2));
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+         //Ира, не ругай за говнокод! ResultSetы пареллельно, как оказалось,
+        //работать не могут и путают друг друга :(
+        List<Product> products=new ArrayList<>();
+        for(int i=0; i<productNames.size(); i++){
+            products.add(new Product(productNames.get(i), getIngredientsById(productIds.get(i))));
         }
         return FXCollections.observableArrayList(products);
     }
 
     private Collection<Ingredient> getIngredientsById(String id){
         Collection<Ingredient> ingredients=new ArrayList<>();
-        String query = "select name from ingredients where id=";
+        String queryIngr = "select name from ingredients where id=";
         String[] ids=id.split("\\s+");
         for(String cur: ids){
-            try (ResultSet rs = statement.executeQuery(query+cur+";")) {
-                while (rs.next()) {
-                    ingredients.add(new Ingredient(rs.getString(1)));
+            try (ResultSet resultSet = statement.executeQuery(queryIngr+cur+";")) {
+                while (resultSet.next()) {
+                    ingredients.add(new Ingredient(resultSet.getString(1)));
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -81,6 +89,8 @@ public class DBUtils {
         }
         return ingredients;
     }
+
+
 
     /*
     getAllProducts()
