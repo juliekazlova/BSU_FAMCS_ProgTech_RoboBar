@@ -25,7 +25,7 @@ public class DBUtils {
         return instance;
     }
 
-    public boolean connect(String url, String user, String password) {
+    public void connect(String url, String user, String password) {
         try {
             Class.forName(Options.JDBC_DRIVER);
             System.out.println("[dbDriver] Connecting to database...");
@@ -36,7 +36,6 @@ public class DBUtils {
             e.printStackTrace();
         }
         System.out.println("Connection established...");
-        return true;
     }
 
     public ObservableList<Ingredient> getAllIngredients() {
@@ -64,8 +63,7 @@ public class DBUtils {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        //Ира, не ругай за говнокод! ResultSetы пареллельно, как оказалось,
-        //работать не могут и путают друг друга :(
+
         List<Product> products = new ArrayList<>();
         for (int i = 0; i < productNames.size(); i++) {
             products.add(new Product(productNames.get(i), getIngredientsById(productIds.get(i))));
@@ -196,7 +194,7 @@ public class DBUtils {
         return FXCollections.observableArrayList(orders);
     }
 
-    public boolean updateOrderStatus(Order order, OrderStatus status) {
+    public void updateOrderStatus(Order order, OrderStatus status) {
         String query = "UPDATE orders SET status=" + (status.ordinal() + 1) + " WHERE client_id=" +
                 order.getClient().getId() + " and product_id=" + getIdByProduct(order.getProduct()) + ";";
         try {
@@ -204,10 +202,9 @@ public class DBUtils {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return true;
     }
 
-    public boolean addOrder(Order order) {
+    public void addOrder(Order order) {
 
         StringBuilder sb = new StringBuilder("insert into orders (product_id, status, client_id) values (");
         sb.append(getIdByProduct(order.getProduct())).append(", ");
@@ -221,10 +218,9 @@ public class DBUtils {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return true;
     }
 
-    public boolean registerClient(Client client) {
+    public void registerClient(Client client) {
         String query = "insert into users (username) values ('" + client.getFullName() + "');";
         try {
             statement.execute(query);
@@ -232,7 +228,6 @@ public class DBUtils {
             e.printStackTrace();
         }
         client.setId(getIdByClient(client.getFullName()));
-        return true;
     }
 
     public boolean checkBartenderCredentials(String name, String password) {

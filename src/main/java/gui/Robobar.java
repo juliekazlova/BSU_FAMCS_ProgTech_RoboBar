@@ -25,7 +25,6 @@ public class Robobar extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-
         DBUtils dbUtils = DBUtils.getInstance();
         dbUtils.connect(Options.DB_URL, Options.DB_USER, Options.DB_PASS);
         List<String> choices = new ArrayList<>();
@@ -54,19 +53,12 @@ public class Robobar extends Application {
 
     }
 
-    /**
-     * нашла на просторах интернетика, думаю, пригодится
-     */
     private boolean showLoginDialog() {
         // Create the custom dialog.
         Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Login Bartender");
         dialog.setHeaderText("Enter your credentials");
 
-// Set the icon (must be included in the project).
-//        dialog.setGraphic(new ImageView(this.getClass().getResource("login.png").toString()));
-
-// Set the button types.
         ButtonType loginButtonType = new ButtonType("Login", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
 
@@ -111,7 +103,6 @@ public class Robobar extends Application {
         Optional<Pair<String, String>> result = dialog.showAndWait();
         AtomicBoolean ok = new AtomicBoolean(false);
         result.ifPresent(usernamePassword -> {
-            System.out.println("Username=" + usernamePassword.getKey() + ", Password=" + usernamePassword.getValue());
             ok.set(DBUtils.getInstance().checkBartenderCredentials(usernamePassword.getKey(), usernamePassword.getValue()));
             if (!ok.get()) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -171,7 +162,6 @@ public class Robobar extends Application {
         Optional<String> result = dialog.showAndWait();
 
         result.ifPresent(name -> {
-            System.out.println("Username=" + name);
             Client user = new Client(name);
             DBUtils.getInstance().registerClient(user);
             new UserWindow(user).start(new Stage());

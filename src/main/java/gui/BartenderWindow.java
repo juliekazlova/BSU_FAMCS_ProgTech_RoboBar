@@ -32,12 +32,14 @@ public class BartenderWindow extends Application {
         ingredientTableColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         ingredientTable.getColumns().add(ingredientTableColumn);
         ingredientsTab.setContent(ingredientTable);
+        ingredientTable.setPrefSize(500, 450);
+
 
         Tab ordersTab = new Tab();
         ordersTab.setText("orders");
         TableView<Order> ordersTable = new TableView<>(orders);
         TableColumn<Order, String> productColumn = new TableColumn<>("Products");
-        productColumn.setCellValueFactory(new PropertyValueFactory<>("products"));
+        productColumn.setCellValueFactory(new PropertyValueFactory<>("product"));
         TableColumn<Order, String> statusColumn = new TableColumn<>("status");
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         TableColumn<Order, String> clientColumn = new TableColumn<>("Client");
@@ -45,12 +47,16 @@ public class BartenderWindow extends Application {
         ordersTable.getColumns().add(productColumn);
         ordersTable.getColumns().add(statusColumn);
         ordersTable.getColumns().add(clientColumn);
+        ordersTable.setPrefSize(500, 450);
 
         Button ordersButton = new Button("Give order");
         ordersButton.setOnAction((click) -> {
             completeOrder(ordersTable);
             updateTables(ordersTable, ingredientTable);
         });
+        Button update = new Button("update");
+        update.setOnAction(click -> updateTables(ordersTable, ingredientTable));
+
         FlowPane buttons = new FlowPane(ordersButton);
         FlowPane ordersPane = new FlowPane(ordersTable, buttons);
         ordersTab.setContent(ordersPane);
@@ -58,14 +64,11 @@ public class BartenderWindow extends Application {
         tabBarPane.getTabs().addAll(ordersTab, ingredientsTab);
         FlowPane pane = new FlowPane(tabBarPane);
         BorderPane root = new BorderPane();
-        root.setLeft(pane);
-        Button update = new Button("update");
-        update.setOnAction(click -> updateTables(ordersTable, ingredientTable));
+        root.setCenter(pane);
+
         root.setBottom(new FlowPane(update));
         Scene scene = new Scene(root, 500, 550);
         primaryStage.setScene(scene);
-        primaryStage.setWidth(500);
-        primaryStage.setHeight(750);
         primaryStage.show();
     }
 

@@ -48,21 +48,19 @@ public class UserWindow extends Application {
             ingredientsColumn.setCellValueFactory(new PropertyValueFactory<>("ingredients"));
             table.getColumns().add(nameColumn);
             table.getColumns().add(ingredientsColumn);
-//            table.setPrefSize(500, 450);
+            table.setPrefSize(500, 450);
 
             Tab ordersTab = new Tab();
             ordersTab.setText("orders");
 
             TableView<Order> orderTable = new TableView<>(clientOrders);
             TableColumn<Order, String> productColumn = new TableColumn<>("Products");
-            //TableColumn<Student, Integer> mathColumn = new TableColumn<>("Math");
-            //mathColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getMath().getValue()));
             productColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getProduct().getName()));
             TableColumn<Order, String> statusColumn = new TableColumn<>("status");
             statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
             orderTable.getColumns().add(productColumn);
             orderTable.getColumns().add(statusColumn);
-//            table.setPrefSize(500, 450);
+            orderTable.setPrefSize(500, 450);
 
             Button orderButton = new Button("Order");
             orderButton.setOnAction((click) -> {
@@ -83,8 +81,6 @@ public class UserWindow extends Application {
             root.setBottom(new FlowPane(update));
             Scene scene = new Scene(root, 500, 550);
             stage.setScene(scene);
-            stage.setWidth(400);
-            stage.setHeight(550);
             stage.show();
         } catch (Exception e) {
             new Alert(Alert.AlertType.ERROR, "Unexpected error").showAndWait();
