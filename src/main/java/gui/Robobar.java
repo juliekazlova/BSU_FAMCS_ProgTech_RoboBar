@@ -174,7 +174,7 @@ public class Robobar extends Application {
             System.out.println("Username=" + name);
             Client user = new Client(name);
             DBUtils.getInstance().registerClient(user);
-            new ProductApp(user).start(new Stage());
+            new UserWindow(user).start(new Stage());
 
         });
     }

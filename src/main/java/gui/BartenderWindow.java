@@ -47,7 +47,10 @@ public class BartenderWindow extends Application {
         ordersTable.getColumns().add(clientColumn);
 
         Button ordersButton = new Button("Give order");
-        ordersButton.setOnAction((click) -> completeOrder(ordersTable));
+        ordersButton.setOnAction((click) -> {
+            completeOrder(ordersTable);
+            updateTables(ordersTable, ingredientTable);
+        });
         FlowPane buttons = new FlowPane(ordersButton);
         FlowPane ordersPane = new FlowPane(ordersTable, buttons);
         ordersTab.setContent(ordersPane);
@@ -59,7 +62,7 @@ public class BartenderWindow extends Application {
         Button update = new Button("update");
         update.setOnAction(click -> updateTables(ordersTable, ingredientTable));
         root.setBottom(new FlowPane(update));
-        Scene scene = new Scene(root, 500, 700);
+        Scene scene = new Scene(root, 500, 550);
         primaryStage.setScene(scene);
         primaryStage.setWidth(500);
         primaryStage.setHeight(750);

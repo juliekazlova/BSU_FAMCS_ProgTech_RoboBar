@@ -2,6 +2,7 @@ package gui;
 
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -15,27 +16,19 @@ import models.Order;
 import models.OrderStatus;
 import models.Product;
 import utils.DBUtils;
-import utils.FakeData;
 
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-
-public class ProductApp extends Application {
+public class UserWindow extends Application {
     private ObservableList<Product> products;
     private ObservableList<Order> clientOrders;
     private DBUtils productService = DBUtils.getInstance();
     private Client currentUser;
 
-    public ProductApp() {
+    public UserWindow() {
 
     }
 
-    public ProductApp(Client user) {
+    public UserWindow(Client user) {
         this.currentUser = user;
-    }
-
-    public static void main(String[] args) {
-        Application.launch(args);
     }
 
     @Override
@@ -55,22 +48,27 @@ public class ProductApp extends Application {
             ingredientsColumn.setCellValueFactory(new PropertyValueFactory<>("ingredients"));
             table.getColumns().add(nameColumn);
             table.getColumns().add(ingredientsColumn);
-            table.setPrefSize(500, 450);
+//            table.setPrefSize(500, 450);
 
             Tab ordersTab = new Tab();
             ordersTab.setText("orders");
 
             TableView<Order> orderTable = new TableView<>(clientOrders);
             TableColumn<Order, String> productColumn = new TableColumn<>("Products");
-            productColumn.setCellValueFactory(new PropertyValueFactory<>("products"));
+            //TableColumn<Student, Integer> mathColumn = new TableColumn<>("Math");
+            //mathColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getMath().getValue()));
+            productColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getProduct().getName()));
             TableColumn<Order, String> statusColumn = new TableColumn<>("status");
             statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
             orderTable.getColumns().add(productColumn);
             orderTable.getColumns().add(statusColumn);
-            table.setPrefSize(500, 450);
+//            table.setPrefSize(500, 450);
 
             Button orderButton = new Button("Order");
-            orderButton.setOnAction((click) -> orderButtonImpl(table));
+            orderButton.setOnAction((click) -> {
+                orderButtonImpl(table);
+                updateTables(table, orderTable);
+            });
             FlowPane buttons = new FlowPane(orderButton);
             FlowPane productsPane = new FlowPane(table, buttons);
             FlowPane ordersPane = new FlowPane(orderTable);
@@ -83,7 +81,7 @@ public class ProductApp extends Application {
             Button update = new Button("update");
             update.setOnAction(click -> updateTables(table, orderTable));
             root.setBottom(new FlowPane(update));
-            Scene scene = new Scene(root, 500, 700);
+            Scene scene = new Scene(root, 500, 550);
             stage.setScene(scene);
             stage.setWidth(400);
             stage.setHeight(550);
@@ -112,10 +110,5 @@ public class ProductApp extends Application {
             new Alert(Alert.AlertType.ERROR, "Unexpected error").showAndWait();
             ex.printStackTrace();
         }
-    }
-
-    private void updateTables(TableView<Product> table) throws RemoteException {
-        products = FXCollections.observableArrayList(productService.getAllProducts());
-        table.setItems(products);
     }
 }

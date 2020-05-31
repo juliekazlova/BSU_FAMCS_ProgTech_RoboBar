@@ -197,25 +197,24 @@ public class DBUtils {
     }
 
     public boolean updateOrderStatus(Order order, OrderStatus status) {
-        String query = "UPDATE orders SET status=" + (status.ordinal()+1) + " WHERE client_id=" +
-                order.getClient().getId()+" and product_id="+getIdByProduct(order.getProducts())+ ";";
+        String query = "UPDATE orders SET status=" + (status.ordinal() + 1) + " WHERE client_id=" +
+                order.getClient().getId() + " and product_id=" + getIdByProduct(order.getProduct()) + ";";
         try {
             statement.executeUpdate(query);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println("Updated "+status.toString());
-        System.out.println("Updated "+order);
-        System.out.println(query);
         return true;
     }
 
     public boolean addOrder(Order order) {
 
         StringBuilder sb = new StringBuilder("insert into orders (product_id, status, client_id) values (");
-        sb.append(getIdByProduct(order.getProducts()) + ", ");
+        sb.append(getIdByProduct(order.getProduct())).append(", ");
         sb.append(order.getStatus().ordinal() + 1);
-        sb.append("," + order.getClient().getId() + ");");
+        sb.append(",");
+        sb.append(order.getClient().getId());
+        sb.append(");");
 
         try {
             statement.execute(sb.toString());
@@ -246,10 +245,7 @@ public class DBUtils {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if (result == 0) {
-            return false;
-        }
-        return true;
+        return result != 0;
     }
 
 

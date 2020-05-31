@@ -1,25 +1,22 @@
 package models;
 
-import java.util.Collection;
 import java.util.Objects;
 
 public class Order {
-    private Product products; //а может пусть по одному заказывает?
+    private Product product;
     private OrderStatus status;
     private Client client;
     private int id;
-    //private Client forWhom; todo think about
 
-
-    public Order(Product products, OrderStatus status, Client client, int id) {
-        this.products = products;
+    public Order(Product product, OrderStatus status, Client client, int id) {
+        this.product = product;
         this.status = status;
         this.client = client;
         this.id = id;
     }
 
-    public Order(Product products, OrderStatus status, Client client) {
-        this.products = products;
+    public Order(Product product, OrderStatus status, Client client) {
+        this.product = product;
         this.status = status;
         this.client = client;
     }
@@ -40,12 +37,12 @@ public class Order {
         this.client = client;
     }
 
-    public Product getProducts() {
-        return products;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setProducts(Product products) {
-        this.products = products;
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
     public OrderStatus getStatus() {
@@ -59,7 +56,7 @@ public class Order {
     @Override
     public String toString() {
         return "Order{" +
-                "products=" + products +
+                "products=" + product +
                 ", status=" + status +
                 '}';
     }
@@ -69,12 +66,12 @@ public class Order {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Order order = (Order) o;
-        return Objects.equals(products, order.products) &&
+        return Objects.equals(product, order.product) &&
                 status == order.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(products, status);
+        return Objects.hash(product, status);
     }
 }
