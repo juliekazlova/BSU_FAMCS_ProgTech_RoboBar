@@ -2,8 +2,7 @@ package utils;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import models.Ingredient;
-import models.Product;
+import models.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -90,12 +89,64 @@ public class DBUtils {
         return ingredients;
     }
 
+    public ObservableList<Order> getAllOrders() {
+        String query = "select id, product_id, status, client_id from orders;";
+        List<Order> orders=new ArrayList<>();
+        List<Integer> id=new ArrayList<>();
+        List<Integer> product_id=new ArrayList<>();
+        List<Integer> status=new ArrayList<>();
+        List<Integer> client_id=new ArrayList<>();
+        try (ResultSet rs = statement.executeQuery(query)) {
+            while (rs.next()) {
+                id.add(rs.getInt(1));
+                product_id.add(rs.getInt(2));
+                status.add(rs.getInt(3));
+                client_id.add(rs.getInt(4));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        for(int i=0; i<id.size(); i++){
+            orders.add(new Order(
+                    getProductById(product_id.get(i)),
+                    OrderStatus.orderStatusByInt(status.get(i)),
+                    getClientById(client_id.get(i)),
+                    id.get(i)));
+        }
+        return FXCollections.observableArrayList(orders);
+    }
 
+    private Client getClientById(int id){
+        String query = "select username from users where id="+id+";";
+        String name=null;
+        try (ResultSet rs = statement.executeQuery(query)) {
+            while (rs.next()) {
+               name=rs.getString(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new Client(name, id);
+    }
+
+    private Product getProductById(int id){
+        String query = "select name, ingredients_list from products where id="+id+";";
+        String name=null;
+        String ingredients_id=null;
+        try (ResultSet rs = statement.executeQuery(query)) {
+            while (rs.next()) {
+                name=rs.getString(1);
+                ingredients_id=rs.getString(2);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new Product(name, getIngredientsById(ingredients_id));
+    }
 
     /*
-    getAllProducts()
+
     getClientOrders(int id)
-    getAllOrders()
     updateOrderStatus(int id, OrderStatus status)
     addOrder()
     registerClient(String name)

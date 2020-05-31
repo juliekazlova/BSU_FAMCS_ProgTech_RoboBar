@@ -4,16 +4,25 @@ import java.util.Collection;
 import java.util.Objects;
 
 public class Order {
-    private Collection<Product> products; //а может пусть по одному заказывает?
+    private Product products; //а может пусть по одному заказывает?
     private OrderStatus status;
     private Client client;
+    private int id;
     //private Client forWhom; todo think about
 
-    public Collection<Product> getProducts() {
+
+    public Order(Product products, OrderStatus status, Client client, int id) {
+        this.products = products;
+        this.status = status;
+        this.client = client;
+        this.id = id;
+    }
+
+    public Product getProducts() {
         return products;
     }
 
-    public void setProducts(Collection<Product> products) {
+    public void setProducts(Product products) {
         this.products = products;
     }
 
