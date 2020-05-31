@@ -10,6 +10,8 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import models.Client;
 import models.User;
+import utils.DBUtils;
+import utils.Options;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +25,8 @@ public class Robobar extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        DBUtils dbUtils=new DBUtils();
+        dbUtils.connect(Options.DB_URL, Options.DB_USER, Options.DB_PASS);
         List<String> choices = new ArrayList<>();
         choices.add("User");
         choices.add("Bartender");

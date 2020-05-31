@@ -20,7 +20,7 @@ public class BartenderWindow extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Bartender window");
+        primaryStage.setTitle("BartenderWindow");
         primaryStage.show();
         TabPane tabBarPane = new TabPane();
         Tab ingredientsTab = new Tab();
