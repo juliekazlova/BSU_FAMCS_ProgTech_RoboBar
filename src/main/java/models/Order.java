@@ -6,6 +6,7 @@ import java.util.Objects;
 public class Order {
     private Collection<Product> products; //а может пусть по одному заказывает?
     private OrderStatus status;
+    private Client client;
     //private Client forWhom; todo think about
 
     public Collection<Product> getProducts() {

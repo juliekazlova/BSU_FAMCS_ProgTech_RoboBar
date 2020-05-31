@@ -25,8 +25,10 @@ public class Robobar extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-     //   DBUtils dbUtils=new DBUtils();
-      //  dbUtils.connect(Options.DB_URL, Options.DB_USER, Options.DB_PASS);
+
+        DBUtils dbUtils=DBUtils.getInstance();
+        dbUtils.connect(Options.DB_URL, Options.DB_USER, Options.DB_PASS);
+        System.out.println(dbUtils.getAllProducts().toString());
         List<String> choices = new ArrayList<>();
         choices.add("User");
         choices.add("Bartender");

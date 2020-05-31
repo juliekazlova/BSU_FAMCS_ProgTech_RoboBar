@@ -8,6 +8,14 @@ public class Product {
     private String name;
     private Collection<Ingredient> ingredients;
 
+    public Product(String name, Collection<Ingredient> ingredients) {
+        this.name = name;
+        this.ingredients = ingredients;
+    }
+
+    public Product() {
+    }
+
     public static Product getDefaultProduct() {
         Product product = new Product();
         Ingredient water = new Ingredient("Water");
