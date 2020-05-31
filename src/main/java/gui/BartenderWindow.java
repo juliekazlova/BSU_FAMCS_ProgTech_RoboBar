@@ -77,7 +77,7 @@ public class BartenderWindow extends Application {
         try {
             TableView.TableViewSelectionModel<Order> selectionModel = table.getSelectionModel();
             for (Integer selectedIndex : selectionModel.getSelectedIndices()) {
-                DBUtils.getInstance().updateOrderStatus(orders.get(selectedIndex).getClient().getId(), OrderStatus.READY_FOR_CLIENT);
+                DBUtils.getInstance().updateOrderStatus(orders.get(selectedIndex).getId(), OrderStatus.READY_FOR_CLIENT);
             }
 
         } catch (Exception ex) {
