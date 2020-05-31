@@ -1,18 +1,19 @@
 package gui;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import models.Ingredient;
 import models.Order;
+import models.OrderStatus;
 import models.Product;
+import utils.DBUtils;
 
 public class BartenderWindow extends Application {
     private ObservableList<Ingredient> ingredients;
@@ -22,18 +23,31 @@ public class BartenderWindow extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("BartenderWindow");
         primaryStage.show();
+
         TabPane tabBarPane = new TabPane();
         Tab ingredientsTab = new Tab();
         ingredientsTab.setText("ingredients");
         TableView<Ingredient> ingredientTable = new TableView<>(ingredients);
-        //заполнить вот тут таблицу
+        TableColumn<Ingredient, String> ingredientTableColumn = new TableColumn<>("Ingredients");
+        ingredientTableColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        ingredientTable.getColumns().add(ingredientTableColumn);
         ingredientsTab.setContent(ingredientTable);
 
         Tab ordersTab = new Tab();
         ordersTab.setText("orders");
         TableView<Order> ordersTable = new TableView<>(orders);
-        //заполнить вот тут таблицу
-        Button ordersButton=new Button("Give order");
+        TableColumn<Order, String> productColumn = new TableColumn<>("Products");
+        productColumn.setCellValueFactory(new PropertyValueFactory<>("products"));
+        TableColumn<Order, String> statusColumn = new TableColumn<>("status");
+        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        TableColumn<Order, String> clientColumn = new TableColumn<>("Client");
+        statusColumn.setCellValueFactory(new PropertyValueFactory<>("client"));
+        ordersTable.getColumns().add(productColumn);
+        ordersTable.getColumns().add(statusColumn);
+        ordersTable.getColumns().add(clientColumn);
+
+        Button ordersButton = new Button("Give order");
+        ordersButton.setOnAction((click) -> completeOrder(ordersTable));
         FlowPane buttons = new FlowPane(ordersButton);
         FlowPane ordersPane = new FlowPane(ordersTable, buttons);
         ordersTab.setContent(ordersPane);
@@ -42,11 +56,34 @@ public class BartenderWindow extends Application {
         FlowPane pane = new FlowPane(tabBarPane);
         BorderPane root = new BorderPane();
         root.setLeft(pane);
-
+        Button update = new Button("update");
+        update.setOnAction(click -> updateTables(ordersTable, ingredientTable));
+        root.setBottom(new FlowPane(update));
         Scene scene = new Scene(root, 500, 700);
         primaryStage.setScene(scene);
-        primaryStage.setWidth(400);
-        primaryStage.setHeight(550);
+        primaryStage.setWidth(500);
+        primaryStage.setHeight(750);
+        updateTables(ordersTable, ingredientTable);
         primaryStage.show();
+    }
+
+    private void updateTables(TableView<Order> orderTable, TableView<Ingredient> ingredientTable) {
+        orders = FXCollections.observableArrayList(DBUtils.getInstance().getAllOrders());
+        orderTable.setItems(orders);
+        ingredients = FXCollections.observableArrayList(DBUtils.getInstance().getAllIngredients());
+        ingredientTable.setItems(ingredients);
+    }
+
+    private void completeOrder(TableView<Order> table) {
+        try {
+            TableView.TableViewSelectionModel<Order> selectionModel = table.getSelectionModel();
+            for (Integer selectedIndex : selectionModel.getSelectedIndices()) {
+                DBUtils.getInstance().updateOrderStatus(orders.get(selectedIndex).getClient().getId(), OrderStatus.READY_FOR_CLIENT);
+            }
+
+        } catch (Exception ex) {
+            new Alert(Alert.AlertType.ERROR, "Unexpected error").showAndWait();
+            ex.printStackTrace();
+        }
     }
 }

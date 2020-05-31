@@ -9,15 +9,13 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import models.Client;
-import models.Order;
-import models.OrderStatus;
-import models.User;
 import utils.DBUtils;
 import utils.Options;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Robobar extends Application {
 
@@ -28,7 +26,7 @@ public class Robobar extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        DBUtils dbUtils=DBUtils.getInstance();
+        DBUtils dbUtils = DBUtils.getInstance();
         dbUtils.connect(Options.DB_URL, Options.DB_USER, Options.DB_PASS);
         List<String> choices = new ArrayList<>();
         choices.add("User");
@@ -49,12 +47,11 @@ public class Robobar extends Application {
                     user.setFullName("Irina");
                     user.setId(1);
                     new ProductApp(user).start(new Stage());
-                    //todo show window for User
                     break;
                 case "Bartender":
-                    showLoginDialog();
-                    new BartenderWindow().start(new Stage());
-                    //todo show window for Bartender
+                    if (showLoginDialog()) {
+                        new BartenderWindow().start(new Stage());
+                    }
                     break;
             }
         });
@@ -64,7 +61,7 @@ public class Robobar extends Application {
     /**
      * нашла на просторах интернетика, думаю, пригодится
      */
-    private void showLoginDialog() {
+    private boolean showLoginDialog() {
         // Create the custom dialog.
         Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Login Bartender");
@@ -116,11 +113,17 @@ public class Robobar extends Application {
         });
 
         Optional<Pair<String, String>> result = dialog.showAndWait();
-
+        AtomicBoolean ok = new AtomicBoolean(false);
         result.ifPresent(usernamePassword -> {
             System.out.println("Username=" + usernamePassword.getKey() + ", Password=" + usernamePassword.getValue());
+            ok.set(DBUtils.getInstance().checkBartenderCredentials(usernamePassword.getKey(), usernamePassword.getValue()));
+            if (!ok.get()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText("NOT VALID");
+                alert.showAndWait();
+            }
         });
-        //todo save results in DB
+        return ok.get();
     }
 
     private void showUserInputDialog() {
@@ -171,9 +174,9 @@ public class Robobar extends Application {
 
         Optional<String> result = dialog.showAndWait();
 
-        result.ifPresent(usernamePassword -> {
-            System.out.println("Username=" + usernamePassword);
+        result.ifPresent(name -> {
+            System.out.println("Username=" + name);
+            DBUtils.getInstance().registerClient(new Client(name));
         });
-        //   todo save results in DB
     }
 }

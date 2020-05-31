@@ -11,8 +11,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import models.Client;
+import models.Order;
+import models.OrderStatus;
 import models.Product;
-import models.User;
+import utils.DBUtils;
 import utils.FakeData;
 
 import java.rmi.NotBoundException;
@@ -20,12 +22,9 @@ import java.rmi.RemoteException;
 
 public class ProductApp extends Application {
     private ObservableList<Product> products;
-    private FakeData productService;
+    private ObservableList<Order> clientOrders;
+    private DBUtils productService = DBUtils.getInstance();
     private Client currentUser;
-
-    public static void main(String[] args) {
-        Application.launch(args);
-    }
 
     public ProductApp() {
 
@@ -35,13 +34,16 @@ public class ProductApp extends Application {
         this.currentUser = user;
     }
 
+    public static void main(String[] args) {
+        Application.launch(args);
+    }
+
     @Override
     public void start(Stage stage) {
         try {
             stage.setTitle("Client window");
-            initializeProductService();
             products = FXCollections.observableArrayList(productService.getAllProducts());
-
+            clientOrders = productService.getClientOrders(currentUser.getId());
             TabPane tabPane = new TabPane();
             Tab productsTab = new Tab();
             productsTab.setText("products");
@@ -55,22 +57,32 @@ public class ProductApp extends Application {
             table.getColumns().add(ingredientsColumn);
             table.setPrefSize(500, 450);
 
-
             Tab ordersTab = new Tab();
             ordersTab.setText("orders");
-            //сюда можно добавлять таблицу
 
+            TableView<Order> orderTable = new TableView<>(clientOrders);
+            TableColumn<Order, String> productColumn = new TableColumn<>("Products");
+            productColumn.setCellValueFactory(new PropertyValueFactory<>("products"));
+            TableColumn<Order, String> statusColumn = new TableColumn<>("status");
+            statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+            orderTable.getColumns().add(productColumn);
+            orderTable.getColumns().add(statusColumn);
+            table.setPrefSize(500, 450);
 
             Button orderButton = new Button("Order");
             orderButton.setOnAction((click) -> orderButtonImpl(table));
             FlowPane buttons = new FlowPane(orderButton);
             FlowPane productsPane = new FlowPane(table, buttons);
+            FlowPane ordersPane = new FlowPane(orderTable);
             productsTab.setContent(productsPane);
+            ordersTab.setContent(orderTable);
             tabPane.getTabs().addAll(productsTab, ordersTab);
             FlowPane pane = new FlowPane(tabPane);
             BorderPane root = new BorderPane();
             root.setLeft(pane);
-
+            Button update = new Button("update");
+            update.setOnAction(click -> updateTables(table, orderTable));
+            root.setBottom(new FlowPane(update));
             Scene scene = new Scene(root, 500, 700);
             stage.setScene(scene);
             stage.setWidth(400);
@@ -82,12 +94,18 @@ public class ProductApp extends Application {
         }
     }
 
+    private void updateTables(TableView<Product> table, TableView<Order> orderTable) {
+        products = FXCollections.observableArrayList(productService.getAllProducts());
+        table.setItems(products);
+        clientOrders = FXCollections.observableArrayList(productService.getClientOrders(currentUser.getId()));
+        orderTable.setItems(clientOrders);
+    }
+
     private void orderButtonImpl(TableView<Product> table) {
         try {
             TableView.TableViewSelectionModel<Product> selectionModel = table.getSelectionModel();
             for (Integer selectedIndex : selectionModel.getSelectedIndices()) {
-                productService.orderProduct(products.get(selectedIndex), currentUser);
-
+                productService.addOrder(new Order(products.get(selectedIndex), OrderStatus.CREATED, currentUser));
             }
 
         } catch (Exception ex) {
@@ -99,9 +117,5 @@ public class ProductApp extends Application {
     private void updateTables(TableView<Product> table) throws RemoteException {
         products = FXCollections.observableArrayList(productService.getAllProducts());
         table.setItems(products);
-    }
-
-    private void initializeProductService() throws RemoteException, NotBoundException {
-        productService = new FakeData();
     }
 }
