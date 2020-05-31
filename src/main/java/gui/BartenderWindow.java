@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 import models.Ingredient;
 import models.Order;
 import models.OrderStatus;
-import models.Product;
 import utils.DBUtils;
 
 public class BartenderWindow extends Application {
