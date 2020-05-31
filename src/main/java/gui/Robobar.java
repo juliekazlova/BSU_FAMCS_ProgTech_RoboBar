@@ -43,10 +43,6 @@ public class Robobar extends Application {
             switch (data) {
                 case "User":
                     showUserInputDialog();
-                    Client user = new Client();
-                    user.setFullName("Irina");
-                    user.setId(1);
-                    new ProductApp(user).start(new Stage());
                     break;
                 case "Bartender":
                     if (showLoginDialog()) {
@@ -176,7 +172,10 @@ public class Robobar extends Application {
 
         result.ifPresent(name -> {
             System.out.println("Username=" + name);
-            DBUtils.getInstance().registerClient(new Client(name));
+            Client user = new Client(name);
+            DBUtils.getInstance().registerClient(user);
+            new ProductApp(user).start(new Stage());
+
         });
     }
 }

@@ -41,7 +41,7 @@ public class BartenderWindow extends Application {
         TableColumn<Order, String> statusColumn = new TableColumn<>("status");
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         TableColumn<Order, String> clientColumn = new TableColumn<>("Client");
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("client"));
+        clientColumn.setCellValueFactory(new PropertyValueFactory<>("client"));
         ordersTable.getColumns().add(productColumn);
         ordersTable.getColumns().add(statusColumn);
         ordersTable.getColumns().add(clientColumn);
