@@ -23,7 +23,8 @@ public class BartenderWindow extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("BartenderWindow");
         primaryStage.show();
-
+        orders = FXCollections.observableArrayList(DBUtils.getInstance().getAllOrders());
+        ingredients = FXCollections.observableArrayList(DBUtils.getInstance().getAllIngredients());
         TabPane tabBarPane = new TabPane();
         Tab ingredientsTab = new Tab();
         ingredientsTab.setText("ingredients");
@@ -63,7 +64,6 @@ public class BartenderWindow extends Application {
         primaryStage.setScene(scene);
         primaryStage.setWidth(500);
         primaryStage.setHeight(750);
-        updateTables(ordersTable, ingredientTable);
         primaryStage.show();
     }
 
