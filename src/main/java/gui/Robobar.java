@@ -9,6 +9,8 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import models.Client;
+import models.Order;
+import models.OrderStatus;
 import models.User;
 import utils.DBUtils;
 import utils.Options;
@@ -28,7 +30,6 @@ public class Robobar extends Application {
 
         DBUtils dbUtils=DBUtils.getInstance();
         dbUtils.connect(Options.DB_URL, Options.DB_USER, Options.DB_PASS);
-        System.out.println(dbUtils.getAllOrders().toString());
         List<String> choices = new ArrayList<>();
         choices.add("User");
         choices.add("Bartender");

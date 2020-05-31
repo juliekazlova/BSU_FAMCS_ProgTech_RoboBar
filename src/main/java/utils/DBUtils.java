@@ -116,7 +116,7 @@ public class DBUtils {
         return FXCollections.observableArrayList(orders);
     }
 
-    private Client getClientById(int id){
+    public Client getClientById(int id){
         String query = "select username from users where id="+id+";";
         String name=null;
         try (ResultSet rs = statement.executeQuery(query)) {
@@ -129,7 +129,7 @@ public class DBUtils {
         return new Client(name, id);
     }
 
-    private Product getProductById(int id){
+    public Product getProductById(int id){
         String query = "select name, ingredients_list from products where id="+id+";";
         String name=null;
         String ingredients_id=null;
@@ -144,14 +144,110 @@ public class DBUtils {
         return new Product(name, getIngredientsById(ingredients_id));
     }
 
-    /*
+    private int getIdByProduct(Product product){
+        String query = "select id from products where name='"+product.getName()+"';";
+        int id=0;
+        try (ResultSet rs = statement.executeQuery(query)) {
+            while (rs.next()) {
+                id=rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
 
-    getClientOrders(int id)
-    updateOrderStatus(int id, OrderStatus status)
-    addOrder()
-    registerClient(String name)
-    checkBartenderCredentials()
-         */
+    private int getIdByClient(String client){
+        String query = "select id from users where username='"+client+"';";
+        int id=0;
+        try (ResultSet rs = statement.executeQuery(query)) {
+            while (rs.next()) {
+                id=rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
+
+    public ObservableList<Order> getClientOrders(int clientId) {
+        String query = "select id, product_id, status from orders where client_id="+clientId+";";
+        List<Order> orders=new ArrayList<>();
+        List<Integer> id=new ArrayList<>();
+        List<Integer> product_id=new ArrayList<>();
+        List<Integer> status=new ArrayList<>();
+        try (ResultSet rs = statement.executeQuery(query)) {
+            while (rs.next()) {
+                id.add(rs.getInt(1));
+                product_id.add(rs.getInt(2));
+                status.add(rs.getInt(3));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        Client client=getClientById(clientId);
+        for(int i=0; i<id.size(); i++){
+            orders.add(new Order(
+                    getProductById(product_id.get(i)),
+                    OrderStatus.orderStatusByInt(status.get(i)),
+                    client,
+                    id.get(i)));
+        }
+        return FXCollections.observableArrayList(orders);
+    }
+
+    public boolean updateOrderStatus(int id, OrderStatus status){
+        String query="UPDATE orders SET status="+(status.ordinal()+1)+" WHERE id="+id+";";
+        try {
+            statement.execute(query);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    public boolean addOrder(Order order){
+
+        StringBuilder sb=new StringBuilder("insert into orders (product_id, status, client_id) values (");
+        sb.append(getIdByProduct(order.getProducts())+", ");
+        sb.append(order.getStatus().ordinal()+1);
+        sb.append(","+order.getClient().getId()+");");
+
+        try {
+            statement.execute(sb.toString());
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    public boolean registerClient(Client client){
+        String query="insert into users (username) values ('"+client.getFullName()+"');";
+        try {
+            statement.execute(query);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        client.setId(getIdByClient(client.getFullName()));
+        return true;
+    }
+
+    public boolean checkBartenderCredentials(String name, String password){
+        String query="SELECT COUNT(id) FROM bartenders WHERE username='"+name+"' AND password='"+password+"';";
+        int result=0;
+        try (ResultSet rs = statement.executeQuery(query)) {
+            while (rs.next()) {
+                result=rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if(result==0) {
+            return false;
+        }
+        return true;
+    }
+
 
 
 }

@@ -18,6 +18,20 @@ public class Order {
         this.id = id;
     }
 
+    public Order(Product products, OrderStatus status, Client client) {
+        this.products = products;
+        this.status = status;
+        this.client = client;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
     public Product getProducts() {
         return products;
     }
