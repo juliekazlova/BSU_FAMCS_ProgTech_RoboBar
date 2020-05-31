@@ -196,13 +196,17 @@ public class DBUtils {
         return FXCollections.observableArrayList(orders);
     }
 
-    public boolean updateOrderStatus(int id, OrderStatus status) {
-        String query = "UPDATE orders SET status=" + (status.ordinal() + 1) + " WHERE id=" + id + ";";
+    public boolean updateOrderStatus(Order order, OrderStatus status) {
+        String query = "UPDATE orders SET status=" + (status.ordinal()+1) + " WHERE client_id=" +
+                order.getClient().getId()+" and product_id="+getIdByProduct(order.getProducts())+ ";";
         try {
-            statement.execute(query);
+            statement.executeUpdate(query);
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        System.out.println("Updated "+status.toString());
+        System.out.println("Updated "+order);
+        System.out.println(query);
         return true;
     }
 
