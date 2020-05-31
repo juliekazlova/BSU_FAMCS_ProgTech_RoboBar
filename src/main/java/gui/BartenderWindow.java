@@ -38,7 +38,7 @@ public class BartenderWindow extends Application {
         FlowPane ordersPane = new FlowPane(ordersTable, buttons);
         ordersTab.setContent(ordersPane);
 
-        tabBarPane.getTabs().addAll(ingredientsTab, ordersTab);
+        tabBarPane.getTabs().addAll(ordersTab, ingredientsTab);
         FlowPane pane = new FlowPane(tabBarPane);
         BorderPane root = new BorderPane();
         root.setLeft(pane);
