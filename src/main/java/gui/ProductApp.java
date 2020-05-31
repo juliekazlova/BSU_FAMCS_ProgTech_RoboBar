@@ -38,24 +38,36 @@ public class ProductApp extends Application {
     @Override
     public void start(Stage stage) {
         try {
+            stage.setTitle("Client window");
             initializeProductService();
             products = FXCollections.observableArrayList(productService.getAllProducts());
+
+            TabPane tabPane = new TabPane();
+            Tab productsTab = new Tab();
+            productsTab.setText("products");
             TableView<Product> table = new TableView<>(products);
             table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
             TableColumn<Product, String> nameColumn = new TableColumn<>("Product");
             nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
             TableColumn<Product, Integer> ingredientsColumn = new TableColumn<>("Ingredients");
             ingredientsColumn.setCellValueFactory(new PropertyValueFactory<>("ingredients"));
-
             table.getColumns().add(nameColumn);
             table.getColumns().add(ingredientsColumn);
             table.setPrefSize(500, 450);
 
 
+            Tab ordersTab = new Tab();
+            ordersTab.setText("orders");
+            //сюда можно добавлять таблицу
+
+
             Button orderButton = new Button("Order");
             orderButton.setOnAction((click) -> orderButtonImpl(table));
             FlowPane buttons = new FlowPane(orderButton);
-            FlowPane pane = new FlowPane(table, buttons);
+            FlowPane productsPane = new FlowPane(table, buttons);
+            productsTab.setContent(productsPane);
+            tabPane.getTabs().addAll(productsTab, ordersTab);
+            FlowPane pane = new FlowPane(tabPane);
             BorderPane root = new BorderPane();
             root.setLeft(pane);
 
