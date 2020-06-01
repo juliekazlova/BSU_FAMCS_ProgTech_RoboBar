@@ -1,6 +1,8 @@
 package models;
 
-public enum OrderStatus {
+import java.io.Serializable;
+
+public enum OrderStatus implements Serializable {
     CREATED, PROCESSING, READY_FOR_CLIENT;
 
     public static OrderStatus orderStatusByInt(int status) {

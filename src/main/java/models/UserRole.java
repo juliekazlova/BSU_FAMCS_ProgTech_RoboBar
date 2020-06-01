@@ -1,5 +1,7 @@
 package models;
 
-public enum UserRole {
+import java.io.Serializable;
+
+public enum UserRole implements Serializable {
     BARTENDER, CLIENT;
 }

@@ -1,10 +1,11 @@
 package models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
-public class Product {
+public class Product implements Serializable {
     private String name;
     private Collection<Ingredient> ingredients;
 

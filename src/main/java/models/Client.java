@@ -1,8 +1,9 @@
 package models;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Client {
+public class Client implements Serializable {
     private String fullName;
     private int id;
 
@@ -11,7 +12,7 @@ public class Client {
         this.id = id;
     }
 
-    public Client(){
+    public Client() {
     }
 
     public Client(String fullName) {

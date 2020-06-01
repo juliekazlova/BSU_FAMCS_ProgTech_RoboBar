@@ -1,8 +1,9 @@
 package models;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Ingredient {
+public class Ingredient implements Serializable {
     private String name;
 
     public Ingredient() {
