@@ -15,7 +15,6 @@ import models.Client;
 import models.Order;
 import models.OrderStatus;
 import models.Product;
-import server.utils.DBUtils;
 import server.utils.RemoteRobobarService;
 
 import java.rmi.NotBoundException;
@@ -45,7 +44,7 @@ public class UserWindow extends Application {
             initializeRobobarService();
             stage.setTitle("Client window");
             products = FXCollections.observableArrayList(productService.getAllProducts());
-            clientOrders = productService.getClientOrders(currentUser.getId());
+            clientOrders = FXCollections.observableArrayList(productService.getClientOrders(currentUser.getId()));
             TabPane tabPane = new TabPane();
             Tab productsTab = new Tab();
             productsTab.setText("products");
