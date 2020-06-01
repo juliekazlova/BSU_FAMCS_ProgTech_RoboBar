@@ -1,20 +1,19 @@
 package server.utils;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import models.*;
 
+import models.*;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Collection;
 
 public interface RemoteRobobarService extends Remote {
-    ObservableList<Ingredient> getAllIngredients() throws RemoteException;
+    Collection<Ingredient> getAllIngredients() throws RemoteException;
 
-    ObservableList<Product> getAllProducts() throws RemoteException;
+    Collection<Product> getAllProducts() throws RemoteException;
 
-    ObservableList<Order> getAllOrders() throws RemoteException;
+    Collection<Order> getAllOrders() throws RemoteException;
 
-    ObservableList<Order> getClientOrders(int clientId) throws RemoteException;
+    Collection<Order> getClientOrders(int clientId) throws RemoteException;
 
     void updateOrderStatus(Order order, OrderStatus status) throws RemoteException;
 

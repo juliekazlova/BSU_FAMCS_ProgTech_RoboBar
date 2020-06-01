@@ -1,7 +1,5 @@
 package server.utils;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import models.*;
 
 import java.rmi.RemoteException;
@@ -43,7 +41,7 @@ public class DBUtils implements RemoteRobobarService {
     }
 
     @Override
-    public ObservableList<Ingredient> getAllIngredients() throws RemoteException {
+    public Collection<Ingredient> getAllIngredients() throws RemoteException {
         String query = "select name from ingredients;";
         List<Ingredient> ingredients = new ArrayList<>();
         try (ResultSet rs = connection.createStatement().executeQuery(query)) {
@@ -53,11 +51,11 @@ public class DBUtils implements RemoteRobobarService {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return FXCollections.observableArrayList(ingredients);
+        return ingredients;
     }
 
     @Override
-    public ObservableList<Product> getAllProducts() throws RemoteException {
+    public Collection<Product> getAllProducts() throws RemoteException {
         String query = "select name, ingredients_list from products;";
         List<String> productNames = new ArrayList<>();
         List<String> productIds = new ArrayList<>();
@@ -74,7 +72,7 @@ public class DBUtils implements RemoteRobobarService {
         for (int i = 0; i < productNames.size(); i++) {
             products.add(new Product(productNames.get(i), getIngredientsById(productIds.get(i))));
         }
-        return FXCollections.observableArrayList(products);
+        return products;
     }
 
     private Collection<Ingredient> getIngredientsById(String id) {
@@ -94,7 +92,7 @@ public class DBUtils implements RemoteRobobarService {
     }
 
     @Override
-    public ObservableList<Order> getAllOrders() throws RemoteException {
+    public Collection<Order> getAllOrders() throws RemoteException {
         String query = "select id, product_id, status, client_id from orders;";
         List<Order> orders = new ArrayList<>();
         List<Integer> id = new ArrayList<>();
@@ -118,7 +116,7 @@ public class DBUtils implements RemoteRobobarService {
                     getClientById(client_id.get(i)),
                     id.get(i)));
         }
-        return FXCollections.observableArrayList(orders);
+        return orders;
     }
 
     public Client getClientById(int id) {
@@ -176,7 +174,7 @@ public class DBUtils implements RemoteRobobarService {
     }
 
     @Override
-    public ObservableList<Order> getClientOrders(int clientId) throws RemoteException {
+    public Collection<Order> getClientOrders(int clientId) throws RemoteException {
         String query = "select id, product_id, status from orders where client_id=" + clientId + ";";
         List<Order> orders = new ArrayList<>();
         List<Integer> id = new ArrayList<>();
@@ -199,7 +197,7 @@ public class DBUtils implements RemoteRobobarService {
                     client,
                     id.get(i)));
         }
-        return FXCollections.observableArrayList(orders);
+        return orders;
     }
 
     @Override
