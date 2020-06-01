@@ -15,12 +15,20 @@ import models.Client;
 import models.Order;
 import models.OrderStatus;
 import models.Product;
-import utils.DBUtils;
+import server.utils.DBUtils;
+import server.utils.RemoteRobobarService;
+
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+import static server.utils.Options.REMOTE_SERVICE;
 
 public class UserWindow extends Application {
     private ObservableList<Product> products;
     private ObservableList<Order> clientOrders;
-    private DBUtils productService = DBUtils.getInstance();
+    private RemoteRobobarService productService ;
     private Client currentUser;
 
     public UserWindow() {
@@ -34,6 +42,7 @@ public class UserWindow extends Application {
     @Override
     public void start(Stage stage) {
         try {
+            initializeRobobarService();
             stage.setTitle("Client window");
             products = FXCollections.observableArrayList(productService.getAllProducts());
             clientOrders = productService.getClientOrders(currentUser.getId());
@@ -106,5 +115,13 @@ public class UserWindow extends Application {
             new Alert(Alert.AlertType.ERROR, "Unexpected error").showAndWait();
             ex.printStackTrace();
         }
+    }
+    private void initializeRobobarService() throws RemoteException, NotBoundException {
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
+        Registry registry = LocateRegistry.getRegistry("127.0.0.1", 1099);
+        productService = (RemoteRobobarService) registry.lookup(REMOTE_SERVICE);
+        System.out.println("Remote service successfully initialized");
     }
 }
