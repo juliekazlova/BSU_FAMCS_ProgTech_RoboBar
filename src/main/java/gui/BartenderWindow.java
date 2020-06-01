@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 import models.Ingredient;
 import models.Order;
 import models.OrderStatus;
-import server.utils.DBUtils;
 import server.utils.RemoteRobobarService;
 
 import java.rmi.NotBoundException;
@@ -33,8 +32,8 @@ public class BartenderWindow extends Application {
             initializeRobobarService();
             primaryStage.setTitle("BartenderWindow");
             primaryStage.show();
-            orders = FXCollections.observableArrayList(DBUtils.getInstance().getAllOrders());
-            ingredients = FXCollections.observableArrayList(DBUtils.getInstance().getAllIngredients());
+            orders = FXCollections.observableArrayList(robobarService.getAllOrders());
+            ingredients = FXCollections.observableArrayList(robobarService.getAllIngredients());
             TabPane tabBarPane = new TabPane();
             Tab ingredientsTab = new Tab();
             ingredientsTab.setText("ingredients");
@@ -81,24 +80,28 @@ public class BartenderWindow extends Application {
             Scene scene = new Scene(root, 500, 550);
             primaryStage.setScene(scene);
 
-        }catch (RemoteException|NotBoundException e){
+        } catch (RemoteException | NotBoundException e) {
             new Alert(Alert.AlertType.ERROR, "Unexpected remote error").showAndWait();
             e.printStackTrace();
         }
     }
 
     private void updateTables(TableView<Order> orderTable, TableView<Ingredient> ingredientTable) {
-        orders = FXCollections.observableArrayList(DBUtils.getInstance().getAllOrders());
-        orderTable.setItems(orders);
-        ingredients = FXCollections.observableArrayList(DBUtils.getInstance().getAllIngredients());
-        ingredientTable.setItems(ingredients);
+        try {
+            orders = FXCollections.observableArrayList(robobarService.getAllOrders());
+            orderTable.setItems(orders);
+            ingredients = FXCollections.observableArrayList(robobarService.getAllIngredients());
+            ingredientTable.setItems(ingredients);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     private void completeOrder(TableView<Order> table) {
         try {
             TableView.TableViewSelectionModel<Order> selectionModel = table.getSelectionModel();
             for (Integer selectedIndex : selectionModel.getSelectedIndices()) {
-                DBUtils.getInstance().updateOrderStatus(orders.get(selectedIndex), OrderStatus.READY_FOR_CLIENT);
+                robobarService.updateOrderStatus(orders.get(selectedIndex), OrderStatus.READY_FOR_CLIENT);
             }
 
         } catch (Exception ex) {
@@ -106,6 +109,7 @@ public class BartenderWindow extends Application {
             ex.printStackTrace();
         }
     }
+
     private void initializeRobobarService() throws RemoteException, NotBoundException {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
