@@ -4,19 +4,20 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import models.*;
 
+import java.rmi.RemoteException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class DBUtils implements RemoteRobobarService {
+    private static final DBUtils instance = new DBUtils();
     /*
     in case of timezone error:
     SET GLOBAL time_zone = '+3:00';
      */
     Connection connection;
     private Statement statement;
-    private static final DBUtils instance = new DBUtils();
 
     private DBUtils() {
     }
@@ -39,7 +40,7 @@ public class DBUtils implements RemoteRobobarService {
     }
 
     @Override
-    public ObservableList<Ingredient> getAllIngredients() {
+    public ObservableList<Ingredient> getAllIngredients() throws RemoteException {
         String query = "select name from ingredients;";
         List<Ingredient> ingredients = new ArrayList<>();
         try (ResultSet rs = statement.executeQuery(query)) {
@@ -53,7 +54,7 @@ public class DBUtils implements RemoteRobobarService {
     }
 
     @Override
-    public ObservableList<Product> getAllProducts() {
+    public ObservableList<Product> getAllProducts() throws RemoteException {
         String query = "select name, ingredients_list from products;";
         List<String> productNames = new ArrayList<>();
         List<String> productIds = new ArrayList<>();
@@ -90,7 +91,7 @@ public class DBUtils implements RemoteRobobarService {
     }
 
     @Override
-    public ObservableList<Order> getAllOrders() {
+    public ObservableList<Order> getAllOrders() throws RemoteException {
         String query = "select id, product_id, status, client_id from orders;";
         List<Order> orders = new ArrayList<>();
         List<Integer> id = new ArrayList<>();
@@ -172,7 +173,7 @@ public class DBUtils implements RemoteRobobarService {
     }
 
     @Override
-    public ObservableList<Order> getClientOrders(int clientId) {
+    public ObservableList<Order> getClientOrders(int clientId) throws RemoteException {
         String query = "select id, product_id, status from orders where client_id=" + clientId + ";";
         List<Order> orders = new ArrayList<>();
         List<Integer> id = new ArrayList<>();
@@ -199,7 +200,7 @@ public class DBUtils implements RemoteRobobarService {
     }
 
     @Override
-    public void updateOrderStatus(Order order, OrderStatus status) {
+    public void updateOrderStatus(Order order, OrderStatus status) throws RemoteException {
         String query = "UPDATE orders SET status=" + (status.ordinal() + 1) + " WHERE client_id=" +
                 order.getClient().getId() + " and product_id=" + getIdByProduct(order.getProduct()) + ";";
         try {
@@ -210,7 +211,7 @@ public class DBUtils implements RemoteRobobarService {
     }
 
     @Override
-    public void addOrder(Order order) {
+    public void addOrder(Order order) throws RemoteException {
 
         StringBuilder sb = new StringBuilder("insert into orders (product_id, status, client_id) values (");
         sb.append(getIdByProduct(order.getProduct())).append(", ");
@@ -227,7 +228,7 @@ public class DBUtils implements RemoteRobobarService {
     }
 
     @Override
-    public void registerClient(Client client) {
+    public void registerClient(Client client) throws RemoteException {
         String query = "insert into users (username) values ('" + client.getFullName() + "');";
         try {
             statement.execute(query);
@@ -238,7 +239,7 @@ public class DBUtils implements RemoteRobobarService {
     }
 
     @Override
-    public boolean checkBartenderCredentials(String name, String password) {
+    public boolean checkBartenderCredentials(String name, String password) throws RemoteException {
         String query = "SELECT COUNT(id) FROM bartenders WHERE username='" + name + "' AND password='" + password + "';";
         int result = 0;
         try (ResultSet rs = statement.executeQuery(query)) {
