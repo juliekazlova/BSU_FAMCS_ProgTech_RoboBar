@@ -81,7 +81,7 @@ public class BartenderWindow extends Application {
             Scene scene = new Scene(root, 500, 550);
             primaryStage.setScene(scene);
 
-        }catch (RemoteException e){
+        }catch (RemoteException|NotBoundException e){
             new Alert(Alert.AlertType.ERROR, "Unexpected remote error").showAndWait();
             e.printStackTrace();
         }

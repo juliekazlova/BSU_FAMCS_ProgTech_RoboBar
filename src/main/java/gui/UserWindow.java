@@ -98,10 +98,14 @@ public class UserWindow extends Application {
     }
 
     private void updateTables(TableView<Product> table, TableView<Order> orderTable) {
-        products = FXCollections.observableArrayList(productService.getAllProducts());
-        table.setItems(products);
-        clientOrders = FXCollections.observableArrayList(productService.getClientOrders(currentUser.getId()));
-        orderTable.setItems(clientOrders);
+        try {
+            products = FXCollections.observableArrayList(productService.getAllProducts());
+            table.setItems(products);
+            clientOrders = FXCollections.observableArrayList(productService.getClientOrders(currentUser.getId()));
+            orderTable.setItems(clientOrders);
+        } catch (RemoteException e){
+            e.printStackTrace();
+        }
     }
 
     private void orderButtonImpl(TableView<Product> table) {
