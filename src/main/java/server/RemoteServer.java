@@ -1,10 +1,9 @@
 package server;
 
 import server.utils.DBUtils;
+import server.utils.Options;
 import server.utils.RemoteRobobarService;
 
-import javax.swing.*;
-import java.io.File;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -20,8 +19,9 @@ public class RemoteServer {
         }
         RemoteRobobarService remoteRobobarService = null;
 
-            remoteRobobarService = DBUtils.getInstance();
+        remoteRobobarService = DBUtils.getInstance();
 
+        DBUtils.getInstance().connect(Options.DB_URL, Options.DB_USER, Options.DB_PASS);
         try {
             System.setProperty("java.rmi.server.hostname", "127.0.0.1");
             RemoteRobobarService remote = (RemoteRobobarService) UnicastRemoteObject.exportObject(remoteRobobarService, 0);

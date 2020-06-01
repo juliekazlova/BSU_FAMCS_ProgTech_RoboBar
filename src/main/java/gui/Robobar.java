@@ -9,24 +9,30 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import models.Client;
-import server.utils.DBUtils;
-import server.utils.Options;
+import server.utils.RemoteRobobarService;
 
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static server.utils.Options.REMOTE_SERVICE;
+
 public class Robobar extends Application {
+    private RemoteRobobarService robobarService;
 
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) {
-        DBUtils dbUtils = DBUtils.getInstance();
-        dbUtils.connect(Options.DB_URL, Options.DB_USER, Options.DB_PASS);
+    public void start(Stage primaryStage) throws RemoteException, NotBoundException {
+
+        initializeRobobarService();
         List<String> choices = new ArrayList<>();
         choices.add("User");
         choices.add("Bartender");
@@ -103,7 +109,11 @@ public class Robobar extends Application {
         Optional<Pair<String, String>> result = dialog.showAndWait();
         AtomicBoolean ok = new AtomicBoolean(false);
         result.ifPresent(usernamePassword -> {
-            ok.set(DBUtils.getInstance().checkBartenderCredentials(usernamePassword.getKey(), usernamePassword.getValue()));
+            try {
+                ok.set(robobarService.checkBartenderCredentials(usernamePassword.getKey(), usernamePassword.getValue()));
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             if (!ok.get()) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setHeaderText("NOT VALID");
@@ -162,10 +172,24 @@ public class Robobar extends Application {
         Optional<String> result = dialog.showAndWait();
 
         result.ifPresent(name -> {
+
             Client user = new Client(name);
-            DBUtils.getInstance().registerClient(user);
+            try {
+                robobarService.registerClient(user);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             new UserWindow(user).start(new Stage());
 
         });
+    }
+
+    private void initializeRobobarService() throws RemoteException, NotBoundException {
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
+        Registry registry = LocateRegistry.getRegistry("127.0.0.1", 1099);
+        robobarService = (RemoteRobobarService) registry.lookup(REMOTE_SERVICE);
+        System.out.println("Remote service successfully initialized");
     }
 }

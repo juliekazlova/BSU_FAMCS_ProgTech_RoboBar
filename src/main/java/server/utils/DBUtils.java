@@ -5,7 +5,10 @@ import javafx.collections.ObservableList;
 import models.*;
 
 import java.rmi.RemoteException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +20,7 @@ public class DBUtils implements RemoteRobobarService {
     SET GLOBAL time_zone = '+3:00';
      */
     Connection connection;
-    private Statement statement;
+    //  private Statement statement;
 
     private DBUtils() {
     }
@@ -31,7 +34,7 @@ public class DBUtils implements RemoteRobobarService {
             Class.forName(Options.JDBC_DRIVER);
             System.out.println("[dbDriver] Connecting to database...");
             connection = DriverManager.getConnection(Options.DB_URL + Options.DB_NAME, Options.DB_USER, Options.DB_PASS);
-            statement = connection.createStatement();
+            //    statement = connection.createStatement();
 
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -43,7 +46,7 @@ public class DBUtils implements RemoteRobobarService {
     public ObservableList<Ingredient> getAllIngredients() throws RemoteException {
         String query = "select name from ingredients;";
         List<Ingredient> ingredients = new ArrayList<>();
-        try (ResultSet rs = statement.executeQuery(query)) {
+        try (ResultSet rs = connection.createStatement().executeQuery(query)) {
             while (rs.next()) {
                 ingredients.add(new Ingredient(rs.getString(1)));
             }
@@ -58,7 +61,7 @@ public class DBUtils implements RemoteRobobarService {
         String query = "select name, ingredients_list from products;";
         List<String> productNames = new ArrayList<>();
         List<String> productIds = new ArrayList<>();
-        try (ResultSet rs = statement.executeQuery(query)) {
+        try (ResultSet rs = connection.createStatement().executeQuery(query)) {
             while (rs.next()) {
                 productNames.add(rs.getString(1));
                 productIds.add(rs.getString(2));
@@ -79,7 +82,7 @@ public class DBUtils implements RemoteRobobarService {
         String queryIngr = "select name from ingredients where id=";
         String[] ids = id.split("\\s+");
         for (String cur : ids) {
-            try (ResultSet resultSet = statement.executeQuery(queryIngr + cur + ";")) {
+            try (ResultSet resultSet = connection.createStatement().executeQuery(queryIngr + cur + ";")) {
                 while (resultSet.next()) {
                     ingredients.add(new Ingredient(resultSet.getString(1)));
                 }
@@ -98,7 +101,7 @@ public class DBUtils implements RemoteRobobarService {
         List<Integer> product_id = new ArrayList<>();
         List<Integer> status = new ArrayList<>();
         List<Integer> client_id = new ArrayList<>();
-        try (ResultSet rs = statement.executeQuery(query)) {
+        try (ResultSet rs = connection.createStatement().executeQuery(query)) {
             while (rs.next()) {
                 id.add(rs.getInt(1));
                 product_id.add(rs.getInt(2));
@@ -121,7 +124,7 @@ public class DBUtils implements RemoteRobobarService {
     public Client getClientById(int id) {
         String query = "select username from users where id=" + id + ";";
         String name = null;
-        try (ResultSet rs = statement.executeQuery(query)) {
+        try (ResultSet rs = connection.createStatement().executeQuery(query)) {
             while (rs.next()) {
                 name = rs.getString(1);
             }
@@ -135,7 +138,7 @@ public class DBUtils implements RemoteRobobarService {
         String query = "select name, ingredients_list from products where id=" + id + ";";
         String name = null;
         String ingredients_id = null;
-        try (ResultSet rs = statement.executeQuery(query)) {
+        try (ResultSet rs = connection.createStatement().executeQuery(query)) {
             while (rs.next()) {
                 name = rs.getString(1);
                 ingredients_id = rs.getString(2);
@@ -149,7 +152,7 @@ public class DBUtils implements RemoteRobobarService {
     private int getIdByProduct(Product product) {
         String query = "select id from products where name='" + product.getName() + "';";
         int id = 0;
-        try (ResultSet rs = statement.executeQuery(query)) {
+        try (ResultSet rs = connection.createStatement().executeQuery(query)) {
             while (rs.next()) {
                 id = rs.getInt(1);
             }
@@ -162,7 +165,7 @@ public class DBUtils implements RemoteRobobarService {
     private int getIdByClient(String client) {
         String query = "select id from users where username='" + client + "';";
         int id = 0;
-        try (ResultSet rs = statement.executeQuery(query)) {
+        try (ResultSet rs = connection.createStatement().executeQuery(query)) {
             while (rs.next()) {
                 id = rs.getInt(1);
             }
@@ -179,7 +182,7 @@ public class DBUtils implements RemoteRobobarService {
         List<Integer> id = new ArrayList<>();
         List<Integer> product_id = new ArrayList<>();
         List<Integer> status = new ArrayList<>();
-        try (ResultSet rs = statement.executeQuery(query)) {
+        try (ResultSet rs = connection.createStatement().executeQuery(query)) {
             while (rs.next()) {
                 id.add(rs.getInt(1));
                 product_id.add(rs.getInt(2));
@@ -204,7 +207,7 @@ public class DBUtils implements RemoteRobobarService {
         String query = "UPDATE orders SET status=" + (status.ordinal() + 1) + " WHERE client_id=" +
                 order.getClient().getId() + " and product_id=" + getIdByProduct(order.getProduct()) + ";";
         try {
-            statement.executeUpdate(query);
+            connection.createStatement().executeUpdate(query);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -221,7 +224,7 @@ public class DBUtils implements RemoteRobobarService {
         sb.append(");");
 
         try {
-            statement.execute(sb.toString());
+            connection.createStatement().execute(sb.toString());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -231,7 +234,7 @@ public class DBUtils implements RemoteRobobarService {
     public void registerClient(Client client) throws RemoteException {
         String query = "insert into users (username) values ('" + client.getFullName() + "');";
         try {
-            statement.execute(query);
+            connection.createStatement().execute(query);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -242,7 +245,7 @@ public class DBUtils implements RemoteRobobarService {
     public boolean checkBartenderCredentials(String name, String password) throws RemoteException {
         String query = "SELECT COUNT(id) FROM bartenders WHERE username='" + name + "' AND password='" + password + "';";
         int result = 0;
-        try (ResultSet rs = statement.executeQuery(query)) {
+        try (ResultSet rs = connection.createStatement().executeQuery(query)) {
             while (rs.next()) {
                 result = rs.getInt(1);
             }
