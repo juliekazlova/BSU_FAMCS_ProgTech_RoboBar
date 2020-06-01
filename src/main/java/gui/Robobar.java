@@ -173,13 +173,13 @@ public class Robobar extends Application {
 
         result.ifPresent(name -> {
 
-            Client user = new Client(name);
             try {
-                robobarService.registerClient(user);
+                Client user = new Client(name);
+                new UserWindow(robobarService.registerClient(user)).start(new Stage());
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-            new UserWindow(user).start(new Stage());
+
 
         });
     }

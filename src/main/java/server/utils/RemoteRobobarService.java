@@ -19,7 +19,7 @@ public interface RemoteRobobarService extends Remote {
 
     void addOrder(Order order) throws RemoteException;
 
-    void registerClient(Client client) throws RemoteException;
+    Client registerClient(Client client) throws RemoteException;
 
     boolean checkBartenderCredentials(String name, String password) throws RemoteException;
 }

@@ -229,7 +229,8 @@ public class DBUtils implements RemoteRobobarService {
     }
 
     @Override
-    public void registerClient(Client client) throws RemoteException {
+    public Client registerClient(Client client) throws RemoteException {
+        System.out.println(client);
         String query = "insert into users (username) values ('" + client.getFullName() + "');";
         try {
             connection.createStatement().execute(query);
@@ -237,6 +238,8 @@ public class DBUtils implements RemoteRobobarService {
             e.printStackTrace();
         }
         client.setId(getIdByClient(client.getFullName()));
+        System.out.println(client);
+        return client;
     }
 
     @Override
