@@ -1,4 +1,4 @@
-package utils;
+package server.utils;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class DBUtils {
+public class DBUtils implements RemoteRobobarService {
     /*
     in case of timezone error:
     SET GLOBAL time_zone = '+3:00';
@@ -38,6 +38,7 @@ public class DBUtils {
         System.out.println("Connection established...");
     }
 
+    @Override
     public ObservableList<Ingredient> getAllIngredients() {
         String query = "select name from ingredients;";
         List<Ingredient> ingredients = new ArrayList<>();
@@ -51,6 +52,7 @@ public class DBUtils {
         return FXCollections.observableArrayList(ingredients);
     }
 
+    @Override
     public ObservableList<Product> getAllProducts() {
         String query = "select name, ingredients_list from products;";
         List<String> productNames = new ArrayList<>();
@@ -87,6 +89,7 @@ public class DBUtils {
         return ingredients;
     }
 
+    @Override
     public ObservableList<Order> getAllOrders() {
         String query = "select id, product_id, status, client_id from orders;";
         List<Order> orders = new ArrayList<>();
@@ -114,9 +117,9 @@ public class DBUtils {
         return FXCollections.observableArrayList(orders);
     }
 
-    public Client getClientById(int id){
-        String query = "select username from users where id="+id+";";
-        String name=null;
+    public Client getClientById(int id) {
+        String query = "select username from users where id=" + id + ";";
+        String name = null;
         try (ResultSet rs = statement.executeQuery(query)) {
             while (rs.next()) {
                 name = rs.getString(1);
@@ -168,6 +171,7 @@ public class DBUtils {
         return id;
     }
 
+    @Override
     public ObservableList<Order> getClientOrders(int clientId) {
         String query = "select id, product_id, status from orders where client_id=" + clientId + ";";
         List<Order> orders = new ArrayList<>();
@@ -194,6 +198,7 @@ public class DBUtils {
         return FXCollections.observableArrayList(orders);
     }
 
+    @Override
     public void updateOrderStatus(Order order, OrderStatus status) {
         String query = "UPDATE orders SET status=" + (status.ordinal() + 1) + " WHERE client_id=" +
                 order.getClient().getId() + " and product_id=" + getIdByProduct(order.getProduct()) + ";";
@@ -204,6 +209,7 @@ public class DBUtils {
         }
     }
 
+    @Override
     public void addOrder(Order order) {
 
         StringBuilder sb = new StringBuilder("insert into orders (product_id, status, client_id) values (");
@@ -220,6 +226,7 @@ public class DBUtils {
         }
     }
 
+    @Override
     public void registerClient(Client client) {
         String query = "insert into users (username) values ('" + client.getFullName() + "');";
         try {
@@ -230,6 +237,7 @@ public class DBUtils {
         client.setId(getIdByClient(client.getFullName()));
     }
 
+    @Override
     public boolean checkBartenderCredentials(String name, String password) {
         String query = "SELECT COUNT(id) FROM bartenders WHERE username='" + name + "' AND password='" + password + "';";
         int result = 0;

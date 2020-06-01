@@ -9,8 +9,8 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import models.Client;
-import utils.DBUtils;
-import utils.Options;
+import server.utils.DBUtils;
+import server.utils.Options;
 
 import java.util.ArrayList;
 import java.util.List;
